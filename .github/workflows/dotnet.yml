@@ -57,3 +57,4 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./publish
         publish_branch: gh-pages
+        force_orphan: true  # Optional: Creates an orphan branch if needed
