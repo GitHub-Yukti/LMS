@@ -32,8 +32,8 @@ jobs:
         ports:
           - 1433:1433
         options: >
-          --health-cmd "exit 0" --health-interval 10s --health-timeout 5s --health-retries 5 \
-          
+          --health-cmd "exit 0" --health-interval=10s --health-timeout=5s --health-retries=5
+
     steps:
       - name: Checkout code from the correct branch
         uses: actions/checkout@v3
@@ -84,5 +84,3 @@ jobs:
 
           # Optionally restart the app (systemctl restart, docker restart, etc.)
           ssh user@your-server-ip "sudo systemctl restart your-app.service"
-
-
