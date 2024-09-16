@@ -52,9 +52,15 @@ jobs:
       working-directory: ./LMS
       
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./publish
-        publish_branch: gh-pages
-        force_orphan: true  # Optional: Creates an orphan branch if needed
+      run: |
+        git config --global user.email "yuktibhatnagar@gmail.com"
+        git config --global user.name "github-yukti"
+        git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+        cd gh-pages
+        rm -rf ./*
+        cp -r ../publish/* .
+        git add .
+        git commit -m "Deploy to GitHub Pages"
+        git push origin gh-pages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
