@@ -19,4 +19,4 @@ jobs:
       run: docker pull mcr.microsoft.com/mssql/server:2022-latest
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file ./docker/mvc/up.ps1 --tag my-image-name:$(date +%s)
