@@ -48,25 +48,18 @@ jobs:
       working-directory: ./LMS
       
     - name: Publish
-      run: dotnet publish -c Release -o ./publish
+      run: dotnet publish -c Release -o ./docs
       working-directory: ./LMS
       
     - name: Setup Git
       run: |
         git config --global user.email "yuktibhatnagar@gmail.com"
         git config --global user.name "github-yukti"
-      
-    - name: Create gh-pages branch if not exists
-      run: |
-        git fetch origin gh-pages || echo "Branch gh-pages does not exist"
-        git checkout --orphan gh-pages || echo "Branch gh-pages created"
-        git reset --hard
-      continue-on-error: true
-
+    
     - name: Deploy to GitHub Pages
       run: |
         git add .
         git commit -m "Deploy to GitHub Pages"
-        git push -u origin gh-pages
+        git push -u origin main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
