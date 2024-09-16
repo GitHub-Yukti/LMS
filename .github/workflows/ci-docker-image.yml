@@ -42,3 +42,17 @@ jobs:
 
     - name: Verify SQL Server is running
       run: docker ps
+
+    - name: Copy application code to container
+      run: |
+        # Create a directory in the container to hold the code
+        docker exec sqlserver mkdir -p /lms
+        
+        # Copy the application code to the container's /app directory
+        docker cp . sqlserver:/app
+
+    - name: List files in the container to confirm code is copied
+      run: docker exec sqlserver ls /lms
+
+    - name: Run your app inside the container
+      run: docker exec sqlserver /lms/your-app-start-command
