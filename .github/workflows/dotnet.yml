@@ -66,11 +66,21 @@ jobs:
         
     - name: Deploy to GitHub Pages
       run: |
-          git config --global user.email "yuktibhatnagar@gmail.com"
-          git config --global user.name "github-yukti"
-          git add docs
+        # Navigate to the root of the repository
+        cd $GITHUB_WORKSPACE
+        
+        # Check if there are changes in the docs directory
+        git config --global user.email "yuktibhatnagar@gmail.com"
+        git config --global user.name "github-yukti"
+        git add docs/*
+        
+        # Check if there are any changes to commit
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
           git commit -m "Deploy to GitHub Pages"
           git push
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
