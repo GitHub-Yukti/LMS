@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./LMS/LMS
+        working-directory: ./LMS
         
     steps:
     - uses: actions/checkout@v4
