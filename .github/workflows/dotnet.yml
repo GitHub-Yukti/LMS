@@ -46,8 +46,8 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       working-directory: ./LMS
-      
-    - name: Publish
+
+    - name: Create docs directory
       run: |
         # Navigate to the root of the repository
         cd $GITHUB_WORKSPACE
@@ -55,18 +55,22 @@ jobs:
         # Create the docs folder if it does not exist
         mkdir -p docs
         
-        # create published files to docs folder
-        dotnet publish -c Release -o docs
+    - name: Publish
+      run: dotnet publish -c Release -o ./docs
+      working-directory: ./LMS
+      
+    - name: Debug - List publish directory
+      run: |
+        echo "Contents of publish directory:"
+        ls -alh ./docs
         
-        # Configure git
-        git config --global user.email "yuktibhatnagar@gmail.com"
-        git config --global user.name "github-yukti"
-        
-        # Add changes, commit, and push
-        git add docs
-        git commit -m "Deploy to GitHub Pages"
-        git push
+    - name: Deploy to GitHub Pages
+      run: |
+          git config --global user.email "yuktibhatnagar@gmail.com"
+          git config --global user.name "github-yukti"
+          git add docs
+          git commit -m "Deploy to GitHub Pages"
+          git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      working-directory: ./LMS
       
