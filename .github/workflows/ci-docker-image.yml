@@ -25,10 +25,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Pull Microsoft SQL Server Docker image
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Pull SQL Server 2022 image
       run: docker pull mcr.microsoft.com/mssql/server:2022-latest
 
-    - name: Build the Docker image
-      run: docker build . --file ./docker/mvc/up.ps1 --tag my-image-name:$(date +%s)
+    - name: Run SQL Server container
+      run: |
+        docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourPassword123!" \
+        -p 1433:1433 --name sqlserver \
+        -d mcr.microsoft.com/mssql/server:2022-latest
+
+    - name: Verify SQL Server is running
+      run: docker ps
