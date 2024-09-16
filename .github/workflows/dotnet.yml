@@ -48,13 +48,13 @@ jobs:
       working-directory: ./LMS
 
     - name: Publish
-      run: dotnet publish -c Release -o docs
+      run: dotnet publish -c Release -o ../docs
       working-directory: ./LMS
       
     - name: Debug - List publish directory
       run: |
         echo "Contents of publish directory:"
-        ls -alh docs
+        ls -alh ../docs
         
     - name: Deploy to GitHub Pages
       run: |
