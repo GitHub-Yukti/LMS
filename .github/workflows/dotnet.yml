@@ -46,3 +46,14 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
       working-directory: ./LMS
+      
+    - name: Publish
+      run: dotnet publish -c Release -o ./publish
+      working-directory: ./LMS
+      
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./publish
+        publish_branch: gh-pages
