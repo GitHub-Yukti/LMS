@@ -51,15 +51,22 @@ jobs:
       run: dotnet publish -c Release -o ./publish
       working-directory: ./LMS
       
-    - name: Setup Git
-      run: |
-        git config --global user.email "yuktibhatnagar@gmail.com"
-        git config --global user.name "github-yukti"
-    
     - name: Deploy to GitHub Pages
       run: |
+        # Navigate to the main folder
+        cd main
+        
+        # Create the docs folder if it does not exist
         mkdir -p docs
-        cp -r publish/* docs/
+        
+        # Move published files to docs folder
+        cp -r ../publish/* docs/
+        
+        # Configure git
+        git config --global user.email "yuktibhatnagar@gmail.com"
+        git config --global user.name "github-yukti"
+        
+        # Add changes, commit, and push
         git add docs
         git commit -m "Deploy to GitHub Pages"
         git push
