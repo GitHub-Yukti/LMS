@@ -32,10 +32,7 @@ jobs:
         ports:
           - 1433:1433
         options: >
-          --health-cmd "exit 0"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd "exit 0" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - name: Checkout code from the correct branch
