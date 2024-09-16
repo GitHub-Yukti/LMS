@@ -1,5 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-name: CI-build-and-push-image-for-dotnetapp
+name: Deploy .NET Core Application with SQL Server
 
 # Controls when the action will run. 
 on:
@@ -20,31 +19,73 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
- docker:
+  build:
     runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          SA_PASSWORD: "p@sSw0rDd"
+        ports:
+          - 1433:1433
+        options: >
+          --health-cmd "exit 0"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-      -
-        name: Checkout
-        uses: actions/checkout@v2
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
+      - name: Checkout code from the correct branch
+        uses: actions/checkout@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v2
+          ref: ${{ github.ref }}  # Automatically uses the branch that triggered the action
+
+      - name: Wait for SQL Server to start
+        run: |
+          echo "Waiting for SQL Server to start..."
+          sleep 30
+
+      - name: Test SQL Server connection
+        run: |
+          /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "p@sSw0rDd" -Q "SELECT @@VERSION"
+
+      - name: Set up connection string
+        run: |
+          CONNECTION_STRING="Server=localhost,1433;Database=master;User Id=sa;Password=p@sSw0rDd;"
+          echo "Connection string set: $CONNECTION_STRING"
+          echo "CONNECTION_STRING=$CONNECTION_STRING" >> $GITHUB_ENV
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
         with:
-          context: .
-          file: ./LearnSmartCoding.API/Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dockerfordotnetapi:latest, ${{ secrets.DOCKERHUB_USERNAME }}/dockerfordotnetapi:${{ github.run_number }}
+          dotnet-version: '7.x' # Adjust this to your .NET version
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the application
+        run: dotnet build --configuration Release
+
+      - name: Publish the application
+        run: |
+          dotnet publish -c Release -o ./publish
+
+      - name: Deploy to server
+        env:
+          CONNECTION_STRING: ${{ env.CONNECTION_STRING }}
+        run: |
+          echo "Deploying to server from branch ${{ github.ref }}..."
+
+          # Example deployment using rsync (adjust to your server)
+          rsync -avz ./publish/ user@your-server-ip:/var/www/your-app/
+
+          # Or use scp to copy files to remote server
+          # scp -r ./publish/* user@your-server-ip:/var/www/your-app/
+
+          # Optionally restart the app (systemctl restart, docker restart, etc.)
+          ssh user@your-server-ip "sudo systemctl restart your-app.service"
+
+
